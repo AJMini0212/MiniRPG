@@ -23,6 +23,7 @@ class Player:
         self.skills = SKILLS
         self.inventory = dict(DEFAULT_INVENTORY)
         self.guarding = False
+        self.gold = 200
 
     def handle_input(self, keys):
         if keys[pygame.K_RIGHT]:
