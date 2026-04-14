@@ -1,8 +1,10 @@
 import pygame
 import sys
+from scenes.menu import MenuScene
 from scenes.world import WorldScene
 from scenes.battle import BattleScene
 from scenes.shop import ShopScene
+from data.save_system import save_game, load_game
 
 WIDTH, HEIGHT = 800, 480
 FPS = 60
@@ -14,8 +16,9 @@ def main():
     pygame.display.set_caption("Mini RPG")
     clock = pygame.time.Clock()
 
-    world = WorldScene(screen)
-    current_scene = "world"
+    current_scene = "menu"
+    menu = MenuScene(screen)
+    world = None
     battle = None
     shop = None
 
@@ -25,22 +28,31 @@ def main():
                 pygame.quit()
                 sys.exit()
 
-            if current_scene == "world":
-                world.handle_event(event)
+            if current_scene == "menu":
+                menu.handle_event(event)
+
+            elif current_scene == "world":
+                result = world.handle_event(event)
+                if result == "menu":
+                    save_game(world.player)
+                    current_scene = "menu"
+                    menu = MenuScene(screen)
 
             elif current_scene == "battle":
                 battle.handle_event(event)
                 if battle.result:
                     if event.type == pygame.KEYDOWN and event.key in (pygame.K_RETURN, pygame.K_z):
                         if battle.result == "lose":
-                            world = WorldScene(screen)
+                            save_game(world.player)
+                            current_scene = "menu"
+                            menu = MenuScene(screen)
                         else:
-                            # 전투 승리/도망 시 골드 획득
                             if battle.result == "win":
                                 gold = battle.monster.exp // 2
                                 world.player.gold += gold
-                        current_scene = "world"
-                        battle = None
+                        if current_scene != "menu":
+                            current_scene = "world"
+                            battle = None
 
             elif current_scene == "shop":
                 result = shop.handle_event(event)
@@ -50,7 +62,26 @@ def main():
                     current_scene = "world"
                     shop = None
 
-        if current_scene == "world":
+        # 메뉴
+        if current_scene == "menu":
+            if menu.choice:
+                if menu.choice == "new_game":
+                    world = WorldScene(screen)
+                    current_scene = "world"
+                    menu.choice = None
+                elif menu.choice == "load_game":
+                    world = WorldScene(screen)
+                    if load_game(world.player):
+                        current_scene = "world"
+                    else:
+                        menu.choice = None
+                elif menu.choice == "quit":
+                    pygame.quit()
+                    sys.exit()
+            menu.draw()
+
+        # 게임 월드
+        elif current_scene == "world":
             world.update()
             world.draw()
             if world.encounter:
@@ -62,9 +93,11 @@ def main():
                 world.open_shop = False
                 current_scene = "shop"
 
+        # 전투
         elif current_scene == "battle":
             battle.draw()
 
+        # 상점
         elif current_scene == "shop":
             shop.draw()
 

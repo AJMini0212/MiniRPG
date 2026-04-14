@@ -1,0 +1,14 @@
+{
+  "x": 457,
+  "y": 0,
+  "hp": 99,
+  "mp": 30,
+  "level": 1,
+  "exp": 10,
+  "gold": 205,
+  "inventory": {
+    "potion": 3,
+    "hi_potion": 1,
+    "ether": 2
+  }
+}

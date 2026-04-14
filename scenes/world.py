@@ -70,6 +70,8 @@ class WorldScene:
             if event.key == pygame.K_RETURN or event.key == pygame.K_z:
                 if self._near_npc():
                     self.open_shop = True
+            elif event.key == pygame.K_ESCAPE:
+                return "menu"
 
     def update(self):
         keys = pygame.key.get_pressed()
