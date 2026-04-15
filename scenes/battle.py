@@ -134,6 +134,11 @@ class BattleScene:
             self.player.guarding = True
             self.log = ["방어 태세를 취했다!"]
             self._monster_attack()
+        elif skill["type"] == "heal":
+            heal_amount = min(25, self.player.max_hp - self.player.hp)
+            self.player.hp += heal_amount
+            self.log = [f"{skill['name']}! HP +{heal_amount}"]
+            self._monster_attack()
 
     def _check_monster_dead(self):
         if not self.monster.is_alive():

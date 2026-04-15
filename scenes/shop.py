@@ -10,9 +10,12 @@ RED = (220, 50, 50)
 GRAY = (180, 180, 180)
 
 SHOP_ITEMS = [
-    {"key": "potion",    "price": 50},
-    {"key": "hi_potion", "price": 120},
-    {"key": "ether",     "price": 80},
+    {"key": "potion",         "price": 50},
+    {"key": "hi_potion",      "price": 120},
+    {"key": "full_potion",    "price": 200},
+    {"key": "ether",          "price": 80},
+    {"key": "full_ether",     "price": 200},
+    {"key": "full_recovery",  "price": 500},
 ]
 
 

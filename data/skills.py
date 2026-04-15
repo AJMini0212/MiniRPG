@@ -20,4 +20,25 @@ SKILLS = [
         "type": "defend",
         "power": 0,
     },
+    {
+        "name": "이단참",
+        "mp_cost": 12,
+        "description": "연속 공격 (매우 강함)",
+        "type": "attack",
+        "power": 2.8,
+    },
+    {
+        "name": "빙결",
+        "mp_cost": 15,
+        "description": "얼음 마법 (방어 무시, 강력)",
+        "type": "magic",
+        "power": 2.0,
+    },
+    {
+        "name": "회복",
+        "mp_cost": 8,
+        "description": "자신을 회복 (HP+25)",
+        "type": "heal",
+        "power": 0,
+    },
 ]
