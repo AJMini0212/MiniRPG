@@ -3,27 +3,41 @@ import random
 from entities.monster import Monster
 from data.items import ITEMS
 
+# 색상 정의
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (220, 50, 50)
 GREEN = (50, 200, 50)
-BLUE = (80, 160, 255)
+BLUE = (100, 180, 255)
 GRAY = (180, 180, 180)
+DARK_GRAY = (100, 100, 100)
 DARK = (40, 40, 40)
+DARK2 = (30, 30, 50)
 YELLOW = (255, 220, 0)
 ORANGE = (255, 160, 0)
+CYAN = (100, 220, 220)
+BORDER = (150, 150, 200)
 
 
-def draw_text(screen, text, x, y, size=24, color=BLACK):
+def draw_text(screen, text, x, y, size=24, color=WHITE):
     font = pygame.font.SysFont("malgungothic", size)
     screen.blit(font.render(text, True, color), (x, y))
 
 
-def draw_bar(screen, x, y, current, maximum, width, color):
-    pygame.draw.rect(screen, GRAY, (x, y, width, 14))
-    ratio = max(0, current / maximum)
-    pygame.draw.rect(screen, color, (x, y, int(width * ratio), 14))
-    pygame.draw.rect(screen, WHITE, (x, y, width, 14), 1)
+def draw_bar(screen, x, y, current, maximum, width, height, color):
+    pygame.draw.rect(screen, DARK_GRAY, (x, y, width, height))
+    if maximum > 0:
+        ratio = max(0, min(1, current / maximum))
+        pygame.draw.rect(screen, color, (x, y, int(width * ratio), height))
+    pygame.draw.rect(screen, BORDER, (x, y, width, height), 2)
+
+
+def draw_card(screen, x, y, w, h, title, bg_color):
+    """정보 카드 배경"""
+    pygame.draw.rect(screen, bg_color, (x, y, w, h))
+    pygame.draw.rect(screen, BORDER, (x, y, w, h), 3)
+    pygame.draw.rect(screen, BORDER, (x, y, w, 35))
+    draw_text(screen, title, x + 15, y + 8, 22, YELLOW)
 
 
 # 메뉴 상태
@@ -165,82 +179,130 @@ class BattleScene:
             self.result = "lose"
 
     def draw(self):
-        self.screen.fill((30, 30, 60))
+        self.screen.fill(DARK2)
 
-        # 몬스터
-        pygame.draw.rect(self.screen, self.monster.color, (480, 80, 80, 80))
-        draw_text(self.screen, self.monster.name, 460, 50, 26, WHITE)
-        draw_bar(self.screen, 440, 172, self.monster.hp, self.monster.max_hp, 200, GREEN if self.monster.hp / self.monster.max_hp > 0.5 else RED)
-        draw_text(self.screen, f"HP {self.monster.hp}/{self.monster.max_hp}", 440, 190, 20, WHITE)
+        # ===== 위: 몬스터/플레이어 정보 카드 =====
+        # 몬스터 카드 (좌측)
+        draw_card(self.screen, 20, 20, 360, 140, f"{self.monster.name}", (60, 40, 40))
 
-        # 플레이어
-        pygame.draw.rect(self.screen, (50, 100, 255), (120, 200, 80, 80))
-        draw_text(self.screen, "플레이어", 100, 170, 26, WHITE)
-        draw_bar(self.screen, 80, 292, self.player.hp, self.player.max_hp, 200, GREEN if self.player.hp / self.player.max_hp > 0.5 else RED)
-        draw_text(self.screen, f"HP {self.player.hp}/{self.player.max_hp}", 80, 308, 20, WHITE)
-        draw_bar(self.screen, 80, 328, self.player.mp, self.player.max_mp, 200, BLUE)
-        draw_text(self.screen, f"MP {self.player.mp}/{self.player.max_mp}", 80, 344, 20, WHITE)
-        draw_text(self.screen, f"Lv.{self.player.level}", 290, 308, 20, YELLOW)
+        # 몬스터 색상 표시
+        pygame.draw.rect(self.screen, self.monster.color, (40, 60, 40, 40))
 
-        # 로그창
-        pygame.draw.rect(self.screen, DARK, (20, 368, 540, 90))
-        pygame.draw.rect(self.screen, WHITE, (20, 368, 540, 90), 2)
-        for i, line in enumerate(self.log[-2:]):
-            draw_text(self.screen, line, 30, 378 + i * 30, 21, WHITE)
+        # 몬스터 스탯
+        draw_text(self.screen, f"HP", 90, 60, 20, CYAN)
+        draw_bar(self.screen, 130, 60, self.monster.hp, self.monster.max_hp, 200, 20, GREEN if self.monster.hp / self.monster.max_hp > 0.3 else RED)
+        draw_text(self.screen, f"{self.monster.hp}/{self.monster.max_hp}", 340, 60, 18, WHITE)
 
-        # 메뉴
+        draw_text(self.screen, f"ATK: {self.monster.attack}  DEF: {self.monster.defense}", 90, 90, 18, GRAY)
+        draw_text(self.screen, f"경험치: {self.monster.exp}", 90, 115, 18, YELLOW)
+
+        # 플레이어 카드 (우측)
+        draw_card(self.screen, 420, 20, 360, 140, "플레이어", (40, 50, 80))
+
+        # 플레이어 색상 표시
+        pygame.draw.rect(self.screen, (50, 100, 255), (440, 60, 40, 40))
+
+        # 플레이어 스탯
+        draw_text(self.screen, f"Lv. {self.player.level}", 490, 60, 20, YELLOW)
+
+        draw_text(self.screen, f"HP", 490, 90, 18, CYAN)
+        draw_bar(self.screen, 530, 90, self.player.hp, self.player.max_hp, 210, 18, GREEN if self.player.hp / self.player.max_hp > 0.3 else RED)
+        draw_text(self.screen, f"{self.player.hp}/{self.player.max_hp}", 745, 90, 16, WHITE)
+
+        draw_text(self.screen, f"MP", 490, 115, 18, CYAN)
+        draw_bar(self.screen, 530, 115, self.player.mp, self.player.max_mp, 210, 18, BLUE)
+        draw_text(self.screen, f"{self.player.mp}/{self.player.max_mp}", 745, 115, 16, WHITE)
+
+        # ===== 중간: 전투 로그 =====
+        pygame.draw.rect(self.screen, DARK, (20, 180, 760, 120))
+        pygame.draw.rect(self.screen, BORDER, (20, 180, 760, 120), 2)
+        draw_text(self.screen, "전투 로그", 30, 185, 18, YELLOW)
+
+        for i, line in enumerate(self.log[-3:]):
+            draw_text(self.screen, line, 35, 210 + i * 30, 20, WHITE)
+
+        # ===== 아래: 액션 메뉴 =====
         self._draw_menu()
 
-        # 결과 오버레이
+        # ===== 결과 오버레이 =====
         if self.result:
             overlay = pygame.Surface((800, 480), pygame.SRCALPHA)
-            overlay.fill((0, 0, 0, 150))
+            overlay.fill((0, 0, 0, 160))
             self.screen.blit(overlay, (0, 0))
+
             if self.result == "win":
-                draw_text(self.screen, "승리!", 340, 180, 52, YELLOW)
+                draw_text(self.screen, "승리!", 320, 140, 56, YELLOW)
                 if self.level_up_msg:
-                    draw_text(self.screen, self.level_up_msg, 290, 245, 32, ORANGE)
+                    draw_text(self.screen, self.level_up_msg, 250, 210, 36, ORANGE)
             elif self.result == "lose":
-                draw_text(self.screen, "패배...", 310, 190, 52, RED)
+                draw_text(self.screen, "패배...", 300, 170, 56, RED)
             elif self.result == "flee":
-                draw_text(self.screen, "도망!", 340, 190, 52, WHITE)
-            draw_text(self.screen, "Enter키로 계속", 290, 300, 28, WHITE)
+                draw_text(self.screen, "도망!", 320, 170, 56, WHITE)
+
+            draw_text(self.screen, "Enter키로 계속", 290, 300, 28, CYAN)
 
     def _draw_menu(self):
-        mx, my, mw, mh = 572, 260, 210, 0
-
         if self.menu == MENU_MAIN:
-            mh = 30 + len(MAIN_ACTIONS) * 34
-            pygame.draw.rect(self.screen, DARK, (mx, my, mw, mh))
-            pygame.draw.rect(self.screen, WHITE, (mx, my, mw, mh), 2)
+            menu_h = 30 + len(MAIN_ACTIONS) * 42
+            pygame.draw.rect(self.screen, DARK, (20, 320, 760, menu_h))
+            pygame.draw.rect(self.screen, BORDER, (20, 320, 760, menu_h), 2)
+            draw_text(self.screen, "액션 선택", 30, 325, 18, YELLOW)
+
+            cols = 2
             for i, action in enumerate(MAIN_ACTIONS):
+                row = i // cols
+                col = i % cols
+                x = 50 + col * 380
+                y = 360 + row * 42
+
                 color = YELLOW if i == self.selected else WHITE
+                bg = (80, 80, 120) if i == self.selected else DARK
+                pygame.draw.rect(self.screen, bg, (x - 10, y - 5, 350, 38))
+                pygame.draw.rect(self.screen, color, (x - 10, y - 5, 350, 38), 1)
+
                 prefix = "▶ " if i == self.selected else "  "
-                draw_text(self.screen, prefix + action, mx + 10, my + 10 + i * 34, 26, color)
+                draw_text(self.screen, prefix + action, x, y, 28, color)
 
         elif self.menu == MENU_SKILL:
             skills = self.player.skills
-            mh = 30 + len(skills) * 34
-            pygame.draw.rect(self.screen, DARK, (mx, my, mw, mh))
-            pygame.draw.rect(self.screen, WHITE, (mx, my, mw, mh), 2)
-            draw_text(self.screen, "[ 스킬 ]", mx + 10, my + 4, 20, YELLOW)
+            menu_h = 30 + len(skills) * 38
+            pygame.draw.rect(self.screen, DARK, (20, 320, 760, menu_h))
+            pygame.draw.rect(self.screen, BORDER, (20, 320, 760, menu_h), 2)
+            draw_text(self.screen, "[ 스킬 ]", 30, 325, 18, YELLOW)
+
             for i, sk in enumerate(skills):
+                y = 360 + i * 38
                 color = YELLOW if i == self.selected else WHITE
-                mp_color = BLUE if self.player.mp >= sk["mp_cost"] else RED
+                mp_ok = self.player.mp >= sk["mp_cost"]
+                mp_color = BLUE if mp_ok else RED
+
+                bg = (80, 80, 120) if i == self.selected else DARK
+                pygame.draw.rect(self.screen, bg, (50, y - 5, 700, 35))
+                pygame.draw.rect(self.screen, color, (50, y - 5, 700, 35), 1)
+
                 prefix = "▶ " if i == self.selected else "  "
-                draw_text(self.screen, prefix + sk["name"], mx + 10, my + 26 + i * 34, 22, color)
-                draw_text(self.screen, f"MP:{sk['mp_cost']}", mx + 140, my + 26 + i * 34, 20, mp_color)
-            draw_text(self.screen, "X: 뒤로", mx + 10, my + mh - 22, 18, GRAY)
+                draw_text(self.screen, prefix + sk["name"], 60, y, 24, color)
+                draw_text(self.screen, f"MP:{sk['mp_cost']}", 320, y, 20, mp_color)
+                draw_text(self.screen, sk["description"], 420, y, 18, GRAY)
 
         elif self.menu == MENU_ITEM:
             items = [k for k, v in self.player.inventory.items() if v > 0]
-            mh = 30 + max(len(items), 1) * 34
-            pygame.draw.rect(self.screen, DARK, (mx, my, mw, mh))
-            pygame.draw.rect(self.screen, WHITE, (mx, my, mw, mh), 2)
-            draw_text(self.screen, "[ 아이템 ]", mx + 10, my + 4, 20, YELLOW)
+            menu_h = 30 + len(items) * 38
+            pygame.draw.rect(self.screen, DARK, (20, 320, 760, menu_h))
+            pygame.draw.rect(self.screen, BORDER, (20, 320, 760, menu_h), 2)
+            draw_text(self.screen, "[ 아이템 ]", 30, 325, 18, YELLOW)
+
             for i, key in enumerate(items):
                 item = ITEMS[key]
+                y = 360 + i * 38
                 color = YELLOW if i == self.selected else WHITE
+
+                bg = (80, 80, 120) if i == self.selected else DARK
+                pygame.draw.rect(self.screen, bg, (50, y - 5, 700, 35))
+                pygame.draw.rect(self.screen, color, (50, y - 5, 700, 35), 1)
+
                 prefix = "▶ " if i == self.selected else "  "
-                draw_text(self.screen, f"{prefix}{item['name']} x{self.player.inventory[key]}", mx + 10, my + 26 + i * 34, 22, color)
-            draw_text(self.screen, "X: 뒤로", mx + 10, my + mh - 22, 18, GRAY)
+                draw_text(self.screen, f"{prefix}{item['name']} x{self.player.inventory[key]}", 60, y, 24, color)
+
+                effect = f"HP+{item['hp']}" if item["hp"] > 0 else f"MP+{item['mp']}"
+                draw_text(self.screen, effect, 420, y, 20, CYAN)
