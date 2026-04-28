@@ -1,14 +1,17 @@
 {
-  "x": 457,
-  "y": 0,
-  "hp": 99,
+  "x": 289,
+  "y": 210,
+  "hp": 100,
   "mp": 30,
   "level": 1,
-  "exp": 10,
-  "gold": 205,
+  "exp": 0,
+  "gold": 200,
   "inventory": {
-    "potion": 3,
-    "hi_potion": 1,
-    "ether": 2
+    "potion": 5,
+    "hi_potion": 2,
+    "ether": 3,
+    "full_potion": 0,
+    "full_ether": 0,
+    "full_recovery": 0
   }
 }
