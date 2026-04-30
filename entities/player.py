@@ -27,6 +27,8 @@ class Player:
         self.direction = "down"  # up, down, left, right
         self.anim_frame = 0  # 0 또는 1
         self.anim_counter = 0
+        self.team = []  # 포획한 몬스터 팀 (최대 6마리)
+        self.team_exp = 0  # 팀 경험치
 
     def handle_input(self, keys):
         moved = False
@@ -124,3 +126,18 @@ class Player:
             self.mp += restored
             msgs.append(f"MP +{restored}")
         return True, msgs
+
+    def catch_monster(self, monster):
+        """몬스터 포획"""
+        if len(self.team) < 6:
+            self.team.append(monster)
+            return True, f"{monster.name}을(를) 포획했다!"
+        return False, "팀이 가득 찼다!"
+
+    def gain_team_exp(self, amount):
+        """팀 전체에 경험치 부여"""
+        self.team_exp += amount
+        exp_per_monster = amount // len(self.team) if self.team else 0
+
+        for monster in self.team:
+            monster.gain_exp(exp_per_monster)
