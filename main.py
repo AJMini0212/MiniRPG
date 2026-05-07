@@ -46,10 +46,12 @@ def main():
                             save_game(world.player)
                             current_scene = "menu"
                             menu = MenuScene(screen)
-                        else:
-                            if battle.result == "win":
-                                gold = battle.monster.exp // 2
-                                world.player.gold += gold
+                        elif battle.result == "win":
+                            gold = battle.enemy_monster.exp_reward // 2
+                            world.player.gold += gold
+                            save_game(world.player)
+                        elif battle.result == "catch":
+                            save_game(world.player)
                         if current_scene != "menu":
                             current_scene = "world"
                             battle = None
