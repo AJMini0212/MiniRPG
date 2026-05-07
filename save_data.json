@@ -1,11 +1,11 @@
 {
-  "x": 289,
-  "y": 210,
+  "x": 643,
+  "y": 156,
   "hp": 100,
   "mp": 30,
   "level": 1,
   "exp": 0,
-  "gold": 200,
+  "gold": 214,
   "inventory": {
     "potion": 5,
     "hi_potion": 2,
@@ -13,5 +13,28 @@
     "full_potion": 0,
     "full_ether": 0,
     "full_recovery": 0
-  }
+  },
+  "team": [
+    {
+      "name": "늑대",
+      "level": 1,
+      "exp": 28,
+      "hp": 13,
+      "max_hp": 25
+    },
+    {
+      "name": "늑대",
+      "level": 1,
+      "exp": 28,
+      "hp": 25,
+      "max_hp": 25
+    },
+    {
+      "name": "스켈레톤",
+      "level": 1,
+      "exp": 19,
+      "hp": 18,
+      "max_hp": 35
+    }
+  ]
 }
