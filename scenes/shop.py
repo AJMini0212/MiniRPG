@@ -58,39 +58,36 @@ class ShopScene:
         self.screen.fill((20, 20, 50))
 
         # 제목
-        pygame.draw.rect(self.screen, DARK, (150, 40, 500, 60))
-        pygame.draw.rect(self.screen, WHITE, (150, 40, 500, 60), 2)
-        draw_text(self.screen, "상점", 360, 55, 32, YELLOW)
+        pygame.draw.rect(self.screen, DARK, (50, 10, 700, 40))
+        pygame.draw.rect(self.screen, WHITE, (50, 10, 700, 40), 2)
+        draw_text(self.screen, "상점", 370, 18, 28, YELLOW)
 
         # 아이템 목록
         for i, entry in enumerate(SHOP_ITEMS):
             item = ITEMS[entry["key"]]
-            box_y = 130 + i * 70
+            box_y = 60 + i * 50
             color = YELLOW if i == self.selected else WHITE
             bg = (60, 60, 90) if i == self.selected else DARK
-            pygame.draw.rect(self.screen, bg, (150, box_y, 500, 58))
-            pygame.draw.rect(self.screen, color, (150, box_y, 500, 58), 2)
+            pygame.draw.rect(self.screen, bg, (50, box_y, 700, 45))
+            pygame.draw.rect(self.screen, color, (50, box_y, 700, 45), 2)
 
             prefix = "▶ " if i == self.selected else "  "
-            draw_text(self.screen, prefix + item["name"], 165, box_y + 8, 26, color)
-            # 아이템 효과
+            draw_text(self.screen, prefix + item["name"], 65, box_y + 6, 22, color)
             effect = f"HP+{item['hp']}" if item["hp"] > 0 else f"MP+{item['mp']}"
-            draw_text(self.screen, effect, 380, box_y + 8, 22, GRAY)
-            # 가격
-            draw_text(self.screen, f"{entry['price']} G", 550, box_y + 8, 24, YELLOW)
-            # 보유 수량
+            draw_text(self.screen, effect, 350, box_y + 6, 18, GRAY)
+            draw_text(self.screen, f"{entry['price']} G", 550, box_y + 6, 20, YELLOW)
             owned = self.player.inventory.get(entry["key"], 0)
-            draw_text(self.screen, f"보유 {owned}개", 165, box_y + 32, 20, GRAY)
+            draw_text(self.screen, f"보유 {owned}개", 650, box_y + 6, 18, GRAY)
 
         # 골드 표시
-        pygame.draw.rect(self.screen, DARK, (150, 360, 500, 44))
-        pygame.draw.rect(self.screen, WHITE, (150, 360, 500, 44), 2)
-        draw_text(self.screen, f"소지 골드: {self.player.gold} G", 165, 370, 24, YELLOW)
+        pygame.draw.rect(self.screen, DARK, (50, 360, 700, 35))
+        pygame.draw.rect(self.screen, WHITE, (50, 360, 700, 35), 2)
+        draw_text(self.screen, f"소지 골드: {self.player.gold} G", 65, 368, 20, YELLOW)
 
         # 메시지창
-        pygame.draw.rect(self.screen, DARK, (150, 415, 500, 50))
-        pygame.draw.rect(self.screen, WHITE, (150, 415, 500, 50), 2)
-        draw_text(self.screen, self.msg, 165, 426, 22, WHITE)
+        pygame.draw.rect(self.screen, DARK, (50, 400, 700, 40))
+        pygame.draw.rect(self.screen, WHITE, (50, 400, 700, 40), 2)
+        draw_text(self.screen, self.msg, 65, 410, 18, WHITE)
 
         # 조작 안내
-        draw_text(self.screen, "Z/Enter: 구매    X: 나가기", 230, 455, 18, GRAY)
+        draw_text(self.screen, "Z/Enter: 구매    X: 나가기", 250, 450, 16, GRAY)

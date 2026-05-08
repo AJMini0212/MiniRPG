@@ -1,11 +1,11 @@
 {
-  "x": 643,
-  "y": 156,
+  "x": 382,
+  "y": 240,
   "hp": 100,
   "mp": 30,
   "level": 1,
   "exp": 0,
-  "gold": 214,
+  "gold": 209,
   "inventory": {
     "potion": 5,
     "hi_potion": 2,
@@ -18,23 +18,9 @@
     {
       "name": "늑대",
       "level": 1,
-      "exp": 28,
-      "hp": 13,
+      "exp": 18,
+      "hp": 5,
       "max_hp": 25
-    },
-    {
-      "name": "늑대",
-      "level": 1,
-      "exp": 28,
-      "hp": 25,
-      "max_hp": 25
-    },
-    {
-      "name": "스켈레톤",
-      "level": 1,
-      "exp": 19,
-      "hp": 18,
-      "max_hp": 35
     }
   ]
 }
