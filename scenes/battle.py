@@ -3,6 +3,7 @@ import random
 from entities.monster import Monster
 from data.items import ITEMS
 from data.capture import attempt_catch
+from effects.effects import EffectManager
 
 # 색상 정의
 WHITE = (255, 255, 255)
@@ -65,6 +66,7 @@ class BattleScene:
         self.log = [f"{self.enemy_monster.name}이(가) 나타났다!"]
         self.result = None
         self.catch_attempt = None  # (success, rate)
+        self.effects = EffectManager()
 
     def handle_event(self, event):
         if self.result or event.type != pygame.KEYDOWN:
@@ -110,6 +112,12 @@ class BattleScene:
         dmg = max(1, self.player_monster.attack - self.enemy_monster.defense + random.randint(-2, 2))
         self.enemy_monster.hp -= dmg
         self.log = [f"{self.player_monster.name}의 공격! {dmg} 데미지!"]
+
+        # 효과 추가
+        self.effects.add_particles(450, 80, 12, (255, 150, 100), 40)
+        self.effects.add_damage_number(450, 60, dmg)
+        self.effects.shake_screen(4, 8)
+
         self._check_enemy_dead() or self._enemy_attack()
 
     def _attempt_capture(self):
@@ -124,6 +132,8 @@ class BattleScene:
                 self.player.gain_team_exp(self.enemy_monster.exp_reward)
                 self.log.append(f"경험치를 얻었다!")
                 self.result = "catch"
+                # 포획 성공 이펙트
+                self.effects.capture_effect(450, 80)
             else:
                 self.log = ["팀이 가득 찼다!"]
                 self._enemy_attack()
@@ -145,6 +155,11 @@ class BattleScene:
         self.player_monster.hp -= dmg
         self.log.append(f"{self.enemy_monster.name}의 공격! {dmg} 데미지!")
 
+        # 데미지 숫자 효과
+        self.effects.add_particles(550, 80, 10, (255, 100, 100), 35)
+        self.effects.add_damage_number(550, 60, dmg, is_critical=False)
+        self.effects.shake_screen(3, 6)
+
         if self.player_monster.hp <= 0:
             self.player_monster.hp = 0
             self.log.append(f"{self.player_monster.name}이(가) 쓰러졌다!")
@@ -160,6 +175,7 @@ class BattleScene:
 
     def draw(self):
         self.screen.fill(DARK2)
+        self.effects.update()
 
         # ===== 위: 몬스터 카드 =====
         # 적 몬스터
@@ -195,6 +211,9 @@ class BattleScene:
 
         # ===== 아래: 메뉴 =====
         self._draw_menu()
+
+        # ===== 효과 =====
+        self.effects.draw(self.screen)
 
         # ===== 결과 =====
         if self.result:
