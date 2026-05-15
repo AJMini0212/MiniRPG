@@ -130,19 +130,36 @@ class WorldScene:
         # 플레이어 그리기
         self.player.draw(self.screen)
 
-        # HUD
-        pygame.draw.rect(self.screen, (0, 0, 0), (5, 5, 380, 72))
-        draw_text(self.screen, f"Lv.{self.player.level}  HP {self.player.hp}/{self.player.max_hp}", 10, 10, 22, WHITE)
-        draw_text(self.screen, f"MP {self.player.mp}/{self.player.max_mp}", 10, 33, 20, (100, 180, 255))
-        draw_text(self.screen, f"Gold {self.player.gold}G", 10, 53, 18, YELLOW)
+        # HUD - 플레이어 정보 패널 (좌상단)
+        pygame.draw.rect(self.screen, (45, 45, 60), (5, 5, 250, 85))
+        pygame.draw.rect(self.screen, (100, 100, 120), (5, 5, 250, 85), 2)
 
-        # 지역 정보
+        draw_text(self.screen, f"Lv. {self.player.level}", 15, 10, 18, YELLOW)
+        draw_text(self.screen, f"HP {self.player.hp}/{self.player.max_hp}", 15, 35, 18, WHITE)
+        draw_text(self.screen, f"MP {self.player.mp}/{self.player.max_mp}", 15, 55, 16, (100, 180, 255))
+        draw_text(self.screen, f"Gold {self.player.gold}G", 130, 10, 16, YELLOW)
+
+        # 팀 상태 표시
+        draw_text(self.screen, f"팀: {len([m for m in self.player.team if m.hp > 0])}/{len(self.player.team)}", 130, 32, 14, WHITE)
+        for i, m in enumerate(self.player.team[:3]):
+            x = 130 + (i % 3) * 30
+            y = 50 + (i // 3) * 12
+            bar_color = (50, 200, 50) if m.hp > 0 else (200, 50, 50)
+            pygame.draw.rect(self.screen, (60, 60, 60), (x, y, 25, 8))
+            hp_ratio = max(0, min(1, m.hp / m.max_hp)) if m.max_hp > 0 else 0
+            pygame.draw.rect(self.screen, bar_color, (x, y, int(25 * hp_ratio), 8))
+
+        # 지역 정보 패널 (우상단)
         region = REGIONS[self.current_region]
         region_info = region["description"]
-        draw_text(self.screen, region_info, 280, 10, 20, YELLOW)
+        pygame.draw.rect(self.screen, (45, 45, 60), (540, 5, 255, 85))
+        pygame.draw.rect(self.screen, (100, 100, 120), (540, 5, 255, 85), 2)
+        draw_text(self.screen, region_info, 555, 15, 20, YELLOW)
 
-        # 지역별 팁
         if self.current_region == "village":
-            draw_text(self.screen, "안전지대 - 몬스터 없음", 280, 32, 18, GRAY)
+            draw_text(self.screen, "안전지대 - 몬스터 없음", 555, 45, 16, WHITE)
         else:
-            draw_text(self.screen, f"난이도: {['약', '중', '강', '극강'][['forest', 'hill', 'cave', 'mountain'].index(self.current_region)]}", 280, 32, 18, GRAY)
+            difficulty = ['약', '중', '강', '극강'][['forest', 'hill', 'cave', 'mountain'].index(self.current_region)]
+            draw_text(self.screen, f"난이도: {difficulty}", 555, 45, 16, WHITE)
+
+        draw_text(self.screen, "방향키: 이동  Z: 상호작용", 555, 65, 14, GRAY)

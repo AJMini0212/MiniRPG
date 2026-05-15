@@ -113,9 +113,9 @@ class BattleScene:
         self.enemy_monster.hp -= dmg
         self.log = [f"{self.player_monster.name}의 공격! {dmg} 데미지!"]
 
-        # 효과 추가
-        self.effects.add_particles(450, 80, 12, (255, 150, 100), 40)
-        self.effects.add_damage_number(450, 60, dmg)
+        # 효과 추가 (적 스프라이트 위치)
+        self.effects.add_particles(590, 110, 12, (255, 150, 100), 40)
+        self.effects.add_damage_number(590, 80, dmg)
         self.effects.shake_screen(4, 8)
 
         self._check_enemy_dead() or self._enemy_attack()
@@ -132,8 +132,8 @@ class BattleScene:
                 self.player.gain_team_exp(self.enemy_monster.exp_reward)
                 self.log.append(f"경험치를 얻었다!")
                 self.result = "catch"
-                # 포획 성공 이펙트
-                self.effects.capture_effect(450, 80)
+                # 포획 성공 이펙트 (적 스프라이트 위치)
+                self.effects.capture_effect(590, 110)
             else:
                 self.log = ["팀이 가득 찼다!"]
                 self._enemy_attack()
@@ -155,9 +155,9 @@ class BattleScene:
         self.player_monster.hp -= dmg
         self.log.append(f"{self.enemy_monster.name}의 공격! {dmg} 데미지!")
 
-        # 데미지 숫자 효과
-        self.effects.add_particles(550, 80, 10, (255, 100, 100), 35)
-        self.effects.add_damage_number(550, 60, dmg, is_critical=False)
+        # 데미지 숫자 효과 (플레이어 스프라이트 위치)
+        self.effects.add_particles(150, 220, 10, (255, 100, 100), 35)
+        self.effects.add_damage_number(150, 190, dmg, is_critical=False)
         self.effects.shake_screen(3, 6)
 
         if self.player_monster.hp <= 0:
@@ -174,40 +174,31 @@ class BattleScene:
                 self.result = "lose"
 
     def draw(self):
-        self.screen.fill(DARK2)
         self.effects.update()
 
-        # ===== 위: 몬스터 카드 =====
-        # 적 몬스터
-        draw_card(self.screen, 20, 20, 360, 140, f"{self.enemy_monster.name}", (60, 40, 40))
-        pygame.draw.rect(self.screen, self.enemy_monster.color, (40, 60, 40, 40))
-        draw_text(self.screen, f"Lv. {self.enemy_monster.level}", 90, 60, 18, YELLOW)
-        draw_text(self.screen, f"HP", 90, 85, 18, CYAN)
-        draw_bar(self.screen, 130, 85, self.enemy_monster.hp, self.enemy_monster.max_hp, 200, 18,
-                 GREEN if self.enemy_monster.hp / self.enemy_monster.max_hp > 0.3 else RED)
+        # ===== 배경 =====
+        pygame.draw.rect(self.screen, (135, 195, 235), (0, 0, 800, 140))    # 하늘색
+        pygame.draw.rect(self.screen, (100, 180, 80), (0, 140, 800, 90))    # 풀밭
+        pygame.draw.rect(self.screen, (180, 150, 90), (0, 200, 800, 90))    # 바닥
+        pygame.draw.rect(self.screen, (40, 35, 45), (0, 290, 800, 190))     # UI 배경
 
-        # 플레이어 몬스터
-        draw_card(self.screen, 420, 20, 360, 140, f"{self.player_monster.name}", (40, 50, 80))
-        pygame.draw.rect(self.screen, self.player_monster.color, (440, 60, 40, 40))
-        draw_text(self.screen, f"Lv. {self.player_monster.level}", 490, 60, 18, YELLOW)
-        draw_text(self.screen, f"HP", 490, 85, 18, CYAN)
-        draw_bar(self.screen, 530, 85, self.player_monster.hp, self.player_monster.max_hp, 210, 18,
-                 GREEN if self.player_monster.hp / self.player_monster.max_hp > 0.3 else RED)
-        draw_text(self.screen, f"{self.player_monster.hp}/{self.player_monster.max_hp}", 745, 85, 16, WHITE)
+        # ===== 적 스프라이트 (우상단) =====
+        pygame.draw.rect(self.screen, self.enemy_monster.color, (540, 60, 100, 100))
 
-        # 팀 상태
-        draw_text(self.screen, f"팀 ({len(self.player.team)}/6)", 430, 110, 18, CYAN)
-        for i, m in enumerate(self.player.team):
-            x = 430 + i * 50
-            bar_color = GREEN if m.hp > 0 else RED
-            draw_bar(self.screen, x, 130, m.hp, m.max_hp, 45, 8, bar_color)
+        # ===== 플레이어 스프라이트 (좌하단) =====
+        pygame.draw.rect(self.screen, self.player_monster.color, (50, 170, 100, 100))
 
-        # ===== 중간: 로그 =====
-        pygame.draw.rect(self.screen, DARK, (20, 170, 760, 80))
-        pygame.draw.rect(self.screen, BORDER, (20, 170, 760, 80), 2)
-        draw_text(self.screen, "전투 로그", 30, 175, 16, YELLOW)
+        # ===== 적 정보창 (좌상단) =====
+        self._draw_info_panel(10, 12, 280, 85, self.enemy_monster, False)
+
+        # ===== 플레이어 정보창 (우하단) =====
+        self._draw_info_panel(430, 185, 355, 100, self.player_monster, True)
+
+        # ===== 로그창 (하단 왼쪽) =====
+        pygame.draw.rect(self.screen, (60, 50, 60), (0, 290, 400, 190))
+        draw_text(self.screen, "전투 로그", 15, 300, 16, YELLOW)
         for i, line in enumerate(self.log[-2:]):
-            draw_text(self.screen, line, 35, 198 + i * 25, 18, WHITE)
+            draw_text(self.screen, line, 15, 330 + i * 30, 18, WHITE)
 
         # ===== 아래: 메뉴 =====
         self._draw_menu()
@@ -232,38 +223,77 @@ class BattleScene:
 
             draw_text(self.screen, "Enter키로 계속", 290, 300, 28, CYAN)
 
+    def _draw_info_panel(self, x, y, w, h, monster, show_team=False):
+        """포켓몬 스타일 정보창 그리기"""
+        # 배경 (둥근 사각형 효과)
+        pygame.draw.rect(self.screen, (45, 45, 60), (x, y, w, h))
+        pygame.draw.rect(self.screen, (100, 100, 120), (x, y, w, h), 2)
+
+        # 이름과 레벨
+        draw_text(self.screen, monster.name, x + 10, y + 10, 20, WHITE)
+        draw_text(self.screen, f"Lv.{monster.level}", x + w - 80, y + 10, 18, YELLOW)
+
+        # HP 바
+        hp_ratio = max(0, min(1, monster.hp / monster.max_hp))
+        bar_color = GREEN if hp_ratio > 0.3 else RED
+        pygame.draw.rect(self.screen, (60, 60, 60), (x + 10, y + 40, w - 20, 12))
+        pygame.draw.rect(self.screen, bar_color, (x + 10, y + 40, int((w - 20) * hp_ratio), 12))
+        pygame.draw.rect(self.screen, (100, 100, 120), (x + 10, y + 40, w - 20, 12), 1)
+
+        if show_team:
+            # HP 수치
+            draw_text(self.screen, f"{monster.hp}/{monster.max_hp}", x + 10, y + 58, 14, WHITE)
+
+            # EXP 바
+            exp_ratio = max(0, min(1, monster.exp / monster.exp_to_level))
+            pygame.draw.rect(self.screen, (40, 40, 60), (x + 10, y + 76, w - 20, 8))
+            pygame.draw.rect(self.screen, (100, 150, 255), (x + 10, y + 76, int((w - 20) * exp_ratio), 8))
+            pygame.draw.rect(self.screen, (100, 100, 120), (x + 10, y + 76, w - 20, 8), 1)
+
     def _draw_menu(self):
         if self.menu == MENU_SELECT:
-            menu_h = 25 + len(self.player.team) * 33
-            pygame.draw.rect(self.screen, DARK, (20, 255, 760, menu_h))
-            pygame.draw.rect(self.screen, BORDER, (20, 255, 760, menu_h), 2)
-            draw_text(self.screen, "몬스터 선택", 30, 260, 16, YELLOW)
+            # 팀 선택 메뉴: 3×2 그리드로 6마리 표시
+            pygame.draw.rect(self.screen, (60, 50, 60), (0, 290, 800, 190))
+            draw_text(self.screen, "몬스터 선택", 15, 300, 16, YELLOW)
 
+            cols, rows = 3, 2
             for i, monster in enumerate(self.player.team):
-                y = 285 + i * 33
+                col = i % cols
+                row = i // cols
+                box_x = col * 267 + 10
+                box_y = row * 85 + 335
+                box_w, box_h = 255, 80
+
                 color = YELLOW if i == self.selected else WHITE
-                bg = (80, 80, 120) if i == self.selected else DARK
-                pygame.draw.rect(self.screen, bg, (50, y - 3, 700, 30))
-                pygame.draw.rect(self.screen, color, (50, y - 3, 700, 30), 1)
+                bg = (80, 80, 100) if i == self.selected else (50, 45, 55)
+                pygame.draw.rect(self.screen, bg, (box_x, box_y, box_w, box_h))
+                pygame.draw.rect(self.screen, color, (box_x, box_y, box_w, box_h), 2)
 
                 status = "살아있음" if monster.hp > 0 else "쓰러짐"
                 status_color = GREEN if monster.hp > 0 else RED
                 prefix = "▶ " if i == self.selected else "  "
-                draw_text(self.screen, f"{prefix}{monster.name} Lv.{monster.level}", 60, y - 2, 20, color)
-                draw_text(self.screen, f"HP {monster.hp}/{monster.max_hp}  {status}", 380, y - 2, 16, status_color)
+                draw_text(self.screen, f"{prefix}{monster.name}", box_x + 10, box_y + 8, 18, color)
+                draw_text(self.screen, f"Lv.{monster.level}", box_x + 10, box_y + 28, 14, YELLOW)
+                draw_text(self.screen, f"HP {monster.hp}/{monster.max_hp}", box_x + 10, box_y + 50, 12, status_color)
 
         elif self.menu == MENU_MAIN:
-            menu_h = 25 + len(MAIN_ACTIONS) * 33
-            pygame.draw.rect(self.screen, DARK, (20, 255, 760, menu_h))
-            pygame.draw.rect(self.screen, BORDER, (20, 255, 760, menu_h), 2)
-            draw_text(self.screen, "액션 선택", 30, 260, 16, YELLOW)
+            # 액션 메뉴: 2×2 그리드 (공격, 포획, 교체, 도망)
+            pygame.draw.rect(self.screen, (60, 50, 60), (400, 290, 400, 190))
+            pygame.draw.rect(self.screen, (200, 50, 50), (400, 290, 400, 190), 3)
+            draw_text(self.screen, "액션", 420, 300, 16, YELLOW)
 
-            for i, action in enumerate(MAIN_ACTIONS):
-                y = 285 + i * 33
+            actions = [MAIN_ACTIONS[i] if i < len(MAIN_ACTIONS) else "" for i in range(4)]
+            for i, action in enumerate(actions):
+                col = i % 2
+                row = i // 2
+                box_x = 400 + col * 200 + 5
+                box_y = 290 + row * 95 + 35
+                box_w, box_h = 190, 85
+
                 color = YELLOW if i == self.selected else WHITE
-                bg = (80, 80, 120) if i == self.selected else DARK
-                pygame.draw.rect(self.screen, bg, (50, y - 3, 700, 30))
-                pygame.draw.rect(self.screen, color, (50, y - 3, 700, 30), 1)
+                bg = (100, 70, 70) if i == self.selected else (50, 45, 55)
+                pygame.draw.rect(self.screen, bg, (box_x, box_y, box_w, box_h))
+                pygame.draw.rect(self.screen, color, (box_x, box_y, box_w, box_h), 2)
 
                 prefix = "▶ " if i == self.selected else "  "
-                draw_text(self.screen, prefix + action, 60, y - 2, 20, color)
+                draw_text(self.screen, prefix + action, box_x + 15, box_y + 30, 22, color)

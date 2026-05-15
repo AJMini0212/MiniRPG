@@ -3,9 +3,11 @@ from data.save_system import has_save
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-DARK = (40, 40, 40)
+RED = (220, 50, 50)
 YELLOW = (255, 220, 0)
 GRAY = (180, 180, 180)
+DARK_BLUE = (80, 120, 180)
+LIGHT_BLUE = (135, 195, 235)
 
 
 def draw_text(screen, text, x, y, size=24, color=WHITE):
@@ -40,21 +42,43 @@ class MenuScene:
                 self.choice = "quit"
 
     def draw(self):
-        self.screen.fill((20, 20, 50))
+        # 배경: 파란 그래디언트 효과
+        for y in range(480):
+            ratio = y / 480
+            r = int(135 * (1 - ratio) + 100 * ratio)
+            g = int(195 * (1 - ratio) + 150 * ratio)
+            b = int(235 * (1 - ratio) + 200 * ratio)
+            pygame.draw.line(self.screen, (r, g, b), (0, y), (800, y))
+
+        # 포켓볼 장식 (좌상단)
+        pygame.draw.circle(self.screen, (220, 50, 50), (80, 60), 40)
+        pygame.draw.circle(self.screen, WHITE, (80, 60), 35)
+        pygame.draw.circle(self.screen, (220, 50, 50), (80, 60), 30)
+        pygame.draw.line(self.screen, WHITE, (50, 60), (110, 60), 5)
+
+        # 포켓볼 장식 (우하단)
+        pygame.draw.circle(self.screen, (220, 50, 50), (720, 400), 35)
+        pygame.draw.circle(self.screen, WHITE, (720, 400), 30)
+        pygame.draw.circle(self.screen, (220, 50, 50), (720, 400), 25)
+        pygame.draw.line(self.screen, WHITE, (695, 400), (745, 400), 4)
 
         # 제목
-        draw_text(self.screen, "Mini RPG", 300, 80, 56, YELLOW)
+        draw_text(self.screen, "Mini RPG", 260, 60, 64, YELLOW)
+        draw_text(self.screen, "게임에 오신 것을 환영합니다!", 200, 130, 24, WHITE)
 
         # 메뉴 아이템
+        menu_y_start = 220
         for i, item in enumerate(self.menu_items):
-            y = 200 + i * 70
+            y = menu_y_start + i * 90
             color = YELLOW if i == self.selected else WHITE
-            bg = (60, 60, 90) if i == self.selected else DARK
-            pygame.draw.rect(self.screen, bg, (250, y, 300, 60))
-            pygame.draw.rect(self.screen, color, (250, y, 300, 60), 2)
+            bg = (150, 80, 80) if i == self.selected else (100, 60, 60)
+
+            # 버튼 박스 (빨간 테두리)
+            pygame.draw.rect(self.screen, bg, (200, y, 400, 70))
+            pygame.draw.rect(self.screen, RED, (200, y, 400, 70), 4)
 
             prefix = "▶ " if i == self.selected else "  "
-            draw_text(self.screen, prefix + item, 270, y + 15, 32, color)
+            draw_text(self.screen, prefix + item, 240, y + 17, 36, color)
 
         # 조작 안내
-        draw_text(self.screen, "위/아래: 선택  Z/Enter: 확인", 220, 440, 20, GRAY)
+        draw_text(self.screen, "위/아래: 선택  Z/Enter: 확인", 220, 450, 18, GRAY)
